@@ -1,35 +1,31 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Loading from "./components/Loading.jsx";
+import { lazy, Suspense } from "react";
+import Layout from "./layout/Layout.jsx";
+
+const Students = lazy(() => import("./pages/Students/Students.jsx"));
+const Courses = lazy(() => import("./pages/Courses/Courses.jsx"));
+const Enrollments = lazy(() => import("./pages/Enrollment/Enrollments.jsx"));
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="*" element={<Navigate to={"/students"} />} />
+        <Route path="/" element={<Navigate to={"/students"} />} />
+        <Route path="/" element={<Layout />}>
+          <Route path="students" element={<Students />} />
+          <Route path="courses" element={<Courses />} />
+          <Route path="enrollments" element={<Enrollments />} />
+        </Route>
+      </Routes>
+    </Suspense>
+  );
 }
 
-export default App
+export default App;

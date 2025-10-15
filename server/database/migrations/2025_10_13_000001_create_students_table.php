@@ -11,7 +11,6 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
-            $table->enum('gender', ['M', 'F']);
             $table->date('birthdate')->nullable();
             $table->string('address')->nullable();
             $table->timestamps();

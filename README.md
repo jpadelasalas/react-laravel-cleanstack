@@ -11,7 +11,7 @@ Designed to showcase best practices for scalable code structure and separation o
 | -------- | ---------------------------------- | ------------------------------ |
 | Frontend | React + Vite + Axios + TailwindCSS | Modern SPA for UI              |
 | Backend  | Laravel 10                         | RESTful API and database logic |
-| Database | MySQL                              | Dummy data through seeding     |
+| Database | MySQL                              | Stores data from migrations    |
 
 ---
 
@@ -31,7 +31,7 @@ cd server
 composer install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
+php artisan migrate
 php artisan serve
 ```
 

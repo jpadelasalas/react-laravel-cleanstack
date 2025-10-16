@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Interfaces\CourseRepositoryInterface;
-use App\Interfaces\StudentRepositoryInterface;
+use App\Repositories\Interfaces\CourseRepositoryInterface;
+use App\Repositories\Interfaces\StudentRepositoryInterface;
 use App\Repositories\CourseRepository;
 use App\Repositories\StudentRepository;
 use Illuminate\Support\ServiceProvider;

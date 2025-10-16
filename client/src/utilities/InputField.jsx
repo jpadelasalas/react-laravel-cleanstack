@@ -9,50 +9,64 @@ const InputField = React.memo(
     className = "",
     onChange,
     error,
-    options = [], // only used for radios
+    options = [], // for radio buttons
     ...customize
   }) => {
-    const errorClass = error ? "border-red-500" : "";
     const baseClass =
-      "rounded-md border border-gray-300 dark:border-gray-700 p-2 outline-none focus:ring-2 focus:ring-blue-400 transition";
-    const combinedClassName = `${baseClass} ${className} ${errorClass}`.trim();
+      "rounded-md border p-2 outline-none transition focus:ring-2 focus:ring-blue-400 ";
 
-    // 🔘 If radio: render list of options
+    const errorClass = error
+      ? "border-red-500 focus:ring-red-400 focus:border-red-500"
+      : "border-gray-300 focus:border-blue-500 border-gray-700";
+
+    const combinedClassName = `${baseClass} ${errorClass} ${className}`.trim();
+
+    // 🔘 Radio Input
     if (type === "radio" && Array.isArray(options)) {
       return (
-        <div className="flex flex-wrap gap-3">
-          {options.map((option) => (
-            <label
-              key={option.value}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <input
-                type="radio"
-                name={name}
-                value={option.value}
-                checked={value === option.value}
-                onChange={onChange}
-                className="accent-blue-500 cursor-pointer"
-                {...customize}
-              />
-              <span>{option.label}</span>
-            </label>
-          ))}
+        <div className="flex flex-col">
+          <div className="flex flex-wrap gap-3">
+            {options.map((option) => (
+              <label
+                key={option.value}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name={name}
+                  value={option.value}
+                  checked={value === option.value}
+                  onChange={onChange}
+                  className="accent-blue-500 cursor-pointer"
+                  {...customize}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {error && (
+            <p className="text-red-500 text-sm font-medium mt-1">{error}</p>
+          )}
         </div>
       );
     }
 
-    // 🧾 Default input (text, number, password, etc.)
+    // 🧾 Default Input (text, email, etc.)
     return (
-      <input
-        type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value ?? ""}
-        onChange={onChange}
-        className={combinedClassName}
-        {...customize}
-      />
+      <div className="flex flex-col">
+        <input
+          type={type}
+          name={name}
+          placeholder={placeholder}
+          value={value ?? ""}
+          onChange={onChange}
+          className={combinedClassName}
+          {...customize}
+        />
+        {error && (
+          <p className="text-red-500 text-sm font-medium mt-1">{error}</p>
+        )}
+      </div>
     );
   }
 );

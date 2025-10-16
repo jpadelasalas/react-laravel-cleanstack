@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Loading from "./components/Loading.jsx";
+import { LoadingFullScreen } from "./components/Loading.jsx";
 import { lazy, Suspense } from "react";
 import Layout from "./layout/Layout.jsx";
 
@@ -14,7 +14,7 @@ const Enrollments = lazy(() => import("./pages/Enrollment/Enrollments.jsx"));
 
 function App() {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<LoadingFullScreen />}>
       <Routes>
         <Route path="*" element={<Navigate to={"/students"} />} />
         <Route path="/" element={<Navigate to={"/students"} />} />

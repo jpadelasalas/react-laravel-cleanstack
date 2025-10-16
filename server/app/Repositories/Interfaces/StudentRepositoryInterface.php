@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Interfaces;
+namespace App\Repositories\Interfaces;
 
 interface StudentRepositoryInterface
 {
     public function getAll();
+    public function getAllWithCourses();
     public function findById($id);
     public function create(array $data);
     public function update($id, array $data);

@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Course;
-use App\Interfaces\CourseRepositoryInterface;
+use App\Repositories\Interfaces\CourseRepositoryInterface;
 
 class CourseRepository implements CourseRepositoryInterface
 {

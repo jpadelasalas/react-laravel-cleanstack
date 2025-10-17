@@ -1,7 +1,7 @@
 /**
  * StudentsContext.jsx
  *
- * Provides a global context for managing student data (CRUD operations),
+ * Provides a scope context for managing student data (CRUD operations),
  * pagination, search, and form handling across the app.
  *
  * Features:
@@ -10,6 +10,7 @@
  * - Manage form input and validation
  * - Handle pagination with search
  * - Manage modal open/close state
+ * - Semi hard-coded. CoursesContext is more simplified
  */
 
 import {

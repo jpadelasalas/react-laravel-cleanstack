@@ -8,3 +8,14 @@ export const studentValidation = (vals) => {
 
   return errors;
 };
+
+export const courseValidation = (vals) => {
+  const errors = {};
+
+  if (!vals.code) errors.code = "Code is required";
+  if (!vals.name) errors.name = "Name is required";
+  if (!vals.description) errors.description = "Description is required";
+  if (!vals.units) errors.units = "Units is required";
+
+  return errors;
+};

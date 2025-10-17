@@ -35,6 +35,8 @@ php artisan migrate
 php artisan serve
 ```
 
+note: Before running php artisan migrate, make sure to setup your db
+
 ### 3. Client Setup (React)
 
 ```bash

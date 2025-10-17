@@ -178,6 +178,7 @@ const StudentsPage = () => {
       </div>
       {isOpenModal && (
         <ModalComponent
+          modalSize={"md"}
           title={title}
           children={children}
           footer={footer}

@@ -2,7 +2,7 @@ import React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 
 const ModalComponent = React.memo(
-  ({ title, modalSize = "md", handleCloseModal, children, footer }) => {
+  ({ title, modalSize, handleCloseModal, children, footer }) => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/30 dark:bg-white/30 text-black">
         {/* Modal Box */}

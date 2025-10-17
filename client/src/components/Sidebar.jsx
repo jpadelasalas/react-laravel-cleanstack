@@ -1,6 +1,7 @@
 import * as MUIIcons from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
+// Better if this is from database.
 const menuItems = [
   {
     label: "Students",

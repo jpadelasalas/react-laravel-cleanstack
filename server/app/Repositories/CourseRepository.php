@@ -7,7 +7,13 @@ use App\Repositories\Interfaces\CourseRepositoryInterface;
 
 class CourseRepository implements CourseRepositoryInterface
 {
+
     public function getAll()
+    {
+        return Course::all();
+    }
+
+    public function getAllWithStudent()
     {
         return Course::with('students')->get();
     }

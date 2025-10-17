@@ -147,12 +147,12 @@ const CoursesPage = () => {
                   scope="row"
                   className="px-6 py-4 font-medium whitespace-nowrap"
                 >
-                  {item.id}
+                  {index + 1}
                 </th>
+                <td className="px-6 py-4">{item.code}</td>
                 <td className="px-6 py-4">{item.name}</td>
-                <td className="px-6 py-4">{item.email}</td>
-                <td className="px-6 py-4">{item.birthdate}</td>
-                <td className="px-6 py-4">{item.address}</td>
+                <td className="px-6 py-4">{item.description}</td>
+                <td className="px-6 py-4">{item.units}</td>
               </tr>
             ))
           ) : (

@@ -38,7 +38,7 @@ class StudentController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Students fetched successfully',
-            'data' => StudentResource::collection($students),
+            'data' => StudentResource::collection($students), // use ::collection if you have array of multiple items
         ], 200);
     }
 

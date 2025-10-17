@@ -101,7 +101,6 @@ const useForm = (initialValues, validate) => {
       e.preventDefault();
       const errors = validateForm(values);
       setIsError(errors);
-      console.log(errors); // useful for debugging
 
       if (Object.keys(errors).length === 0) {
         callback(values);

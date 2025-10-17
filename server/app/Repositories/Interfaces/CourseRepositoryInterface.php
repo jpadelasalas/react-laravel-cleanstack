@@ -5,6 +5,7 @@ namespace App\Repositories\Interfaces;
 interface CourseRepositoryInterface
 {
     public function getAll();
+    public function getAllWithStudent();
     public function findById($id);
     public function create(array $data);
     public function update($id, array $data);

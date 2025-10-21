@@ -74,12 +74,12 @@ export const StudentsContextProvider = ({ children }) => {
   } = usePaginationWithSearch();
 
   /**
-   * 🟢 Fetch students (GET /api/students)
+   * 🟢 Fetch students (GET /api/v1/students)
    */
-  const { data, isFetching, isError } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ["students"],
     queryFn: async () => {
-      const { data } = await axiosInstance.get("/api/students");
+      const { data } = await axiosInstance.get("/api/v1/students");
       return data.data; // backend returns { message, data }
     },
     onError: (err) => {
@@ -92,11 +92,11 @@ export const StudentsContextProvider = ({ children }) => {
   });
 
   /**
-   * 🟢 Add new student (POST /api/students)
+   * 🟢 Add new student (POST /api/v1/students)
    */
   const { mutate: addStudent } = useMutation({
     mutationFn: async (newStudent) => {
-      const { data } = await axiosInstance.post("/api/students", newStudent);
+      const { data } = await axiosInstance.post("/api/v1/students", newStudent);
       return data;
     },
     onMutate: () => {
@@ -126,12 +126,15 @@ export const StudentsContextProvider = ({ children }) => {
   });
 
   /**
-   * 🟡 Update existing student (PUT /api/students/{id})
+   * 🟡 Update existing student (PUT /api/v1/students/{id})
    */
   const { mutate: updateStudent } = useMutation({
     mutationFn: async (student) => {
       const { id, ...payload } = student;
-      const { data } = await axiosInstance.put(`/api/students/${id}`, payload);
+      const { data } = await axiosInstance.put(
+        `/api/v1/students/${id}`,
+        payload
+      );
       return data;
     },
     onMutate: () => {
@@ -163,11 +166,11 @@ export const StudentsContextProvider = ({ children }) => {
   });
 
   /**
-   * 🔴 Delete student (DELETE /api/students/{id})
+   * 🔴 Delete student (DELETE /api/v1/students/{id})
    */
   const { mutate: deleteStudent } = useMutation({
     mutationFn: async (id) => {
-      const { data } = await axiosInstance.delete(`/api/students/${id}`);
+      const { data } = await axiosInstance.delete(`/api/v1/students/${id}`);
       return data;
     },
     onMutate: () => {

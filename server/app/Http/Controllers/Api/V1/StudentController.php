@@ -1,7 +1,12 @@
 <?php
 
 /**
- * Version controlling of API
+ * API Version: v1
+ * 
+ * Controller responsible for managing student records.
+ * 
+ * This controller handles all CRUD operations for students and ensures 
+ * consistent JSON API responses using standardized response helpers.
  */
 
 namespace App\Http\Controllers\Api\V1;
@@ -9,89 +14,161 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StudentRequest;
 use App\Http\Resources\StudentResource;
-use App\Services\StudentService;
+use App\Repositories\Interfaces\StudentRepositoryInterface;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 
 class StudentController extends Controller
 {
     /**
-     * Inject the StudentService dependency.
-     *
-     * This constructor enables the controller to access 
-     * business logic methods defined in the StudentService class.
+     * Include ApiResponseTrait for standardized API success and error responses.
      */
-    public function __construct(protected StudentService $studentService) {}
+    use ApiResponseTrait;
+
+    /**
+     * Student repository instance.
+     *
+     * @var \App\Repositories\Interfaces\StudentRepositoryInterface
+     */
+    protected StudentRepositoryInterface $repo;
+
+    /**
+     * Inject repository dependency.
+     *
+     * @param  \App\Repositories\Interfaces\StudentRepositoryInterface  $repo
+     * @return void
+     *
+     * @note Ensure this interface is bound to its concrete repository implementation
+     *       in a Service Provider (e.g., RepositoryServiceProvider).
+     */
+    public function __construct(StudentRepositoryInterface $repo)
+    {
+        $this->repo = $repo;
+    }
 
     /**
      * Display a listing of all students.
      *
-     * This method retrieves all students from the database
-     * via the StudentService and returns them as a standardized
-     * JSON response using the StudentResource.
+     * Retrieves all student records from the repository layer and returns
+     * them as a standardized JSON response using the StudentResource collection.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @example
+     * GET /api/v1/students
+     *
+     * @note Use a Service layer for complex business logic.
+     *       For simple CRUD, direct Repository calls are acceptable.
      */
     public function index(): JsonResponse
     {
-        // Fetch all students through the service layer
-        $students = $this->studentService->getAllStudents();
+        try {
+            $students = $this->repo->getAll();
 
-        // Transform the collection using the resource for consistent API formatting
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Students fetched successfully',
-            'data' => StudentResource::collection($students), // use ::collection if you have array of multiple items
-        ], 200);
+            return $this->successResponse(
+                StudentResource::collection($students),
+                'Students fetched successfully!'
+            );
+        } catch (\Throwable $th) {
+            return $this->errorResponse(
+                'Unable to fetch students',
+                500,
+                $th->getMessage()
+            );
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created student in storage.
+     *
+     * Validates the request data and creates a new student record.
+     * Returns the created student in a standardized JSON format.
+     *
+     * @param  \App\Http\Requests\StudentRequest  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @example
+     * POST /api/v1/students
      */
-    public function store(StudentRequest $request)
+    public function store(StudentRequest $request): JsonResponse
     {
-        // Create a student through the service layer with request validation
-        $this->studentService->createStudent($request->validated());
+        try {
+            $student = $this->repo->create($request->validated());
 
-        // Transform the collection using the resource for consistent API formatting
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Students added successfully',
-        ], 200);
+            return $this->successResponse(
+                new StudentResource($student),
+                'Student added successfully!'
+            );
+        } catch (\Throwable $th) {
+            return $this->errorResponse(
+                'Unable to add student',
+                500,
+                $th->getMessage()
+            );
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Update the specified student in storage.
+     *
+     * Validates the incoming data and updates the existing student record.
+     * Returns the updated student in standardized JSON format.
+     *
+     * @param  \App\Http\Requests\StudentRequest  $request
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @example
+     * PUT /api/v1/students/{id}
      */
-    public function show(string $id)
+    public function update(StudentRequest $request, string $id): JsonResponse
     {
-        //
+        try {
+            $student = $this->repo->update($id, $request->validated());
+
+            return $this->successResponse(
+                new StudentResource($student),
+                'Student updated successfully!'
+            );
+        } catch (\Throwable $th) {
+            return $this->errorResponse(
+                'Unable to update student',
+                500,
+                $th->getMessage()
+            );
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Remove the specified student from storage.
+     *
+     * Deletes a student record by ID and returns a success message.
+     * No resource data is returned for deletion.
+     *
+     * @param  string  $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @example
+     * DELETE /api/v1/students/{id}
      */
-    public function update(StudentRequest $request, string $id)
+    public function destroy(string $id): JsonResponse
     {
-        // Update a student through the service layer with request validation
-        $this->studentService->updateStudent($id, $request->validated());
+        try {
+            // Delete a course through the repository layer with request validation
+            $this->repo->delete($id);
 
-        // Transform the collection using the resource for consistent API formatting
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Students updated successfully',
-        ], 200);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        // Update a student through the service layer with request validation
-        $this->studentService->deleteStudent($id);
-
-        // Transform the collection using the resource for consistent API formatting
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Students deleted successfully',
-        ], 200);
+            // Return a successResponse if deleted successfully
+            return $this->successResponse(
+                null,
+                'Student deleted successfully!'
+            );
+        } catch (\Throwable $th) {
+            // Throw an errorResponse if there's an error.
+            return $this->errorResponse(
+                'Unable to delete student',
+                500,
+                $th->getMessage()
+            );
+        }
     }
 }

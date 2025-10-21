@@ -117,7 +117,7 @@ const CoursesPage = () => {
         <InputField
           type="text"
           className="border-1 p-2 mx-4 rounded-md w-[90%] md:w-3/4 text-black dark:text-white focus:ring-black focus:border-black"
-          placeholder="Search Student"
+          placeholder="Search Course"
           value={search}
           onChange={handleSearch}
         />

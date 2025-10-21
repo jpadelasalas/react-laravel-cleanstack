@@ -72,7 +72,7 @@ export const CoursesContextProvider = ({ children }) => {
   } = usePaginationWithSearch();
 
   /**
-   * 🟢 Fetch courses (GET /api/courses)
+   * 🟢 Fetch courses (GET /api/v1/courses)
    */
   const { data, isFetching } = useQuery({
     queryKey: ["courses"],
@@ -90,7 +90,7 @@ export const CoursesContextProvider = ({ children }) => {
   });
 
   /**
-   * 🟢 Add new course (POST /api/courses)
+   * 🟢 Add new course (POST /api/v1/courses)
    */
   const { mutate: addCourse } = useMutation({
     mutationFn: async (newCourse) => {
@@ -124,7 +124,7 @@ export const CoursesContextProvider = ({ children }) => {
   });
 
   /**
-   * 🟡 Update existing course (PUT /api/courses/{id})
+   * 🟡 Update existing course (PUT /api/v1/courses/{id})
    */
   const { mutate: updateCourse } = useMutation({
     mutationFn: async (course) => {
@@ -161,7 +161,7 @@ export const CoursesContextProvider = ({ children }) => {
   });
 
   /**
-   * 🔴 Delete course (DELETE /api/courses/{id})
+   * 🔴 Delete course (DELETE /api/v1/courses/{id})
    */
   const { mutate: deleteCourse } = useMutation({
     mutationFn: async (id) => {

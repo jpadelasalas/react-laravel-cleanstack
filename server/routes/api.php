@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\StudentWithCourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,5 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('students', StudentController::class);
-Route::apiResource('courses', CourseController::class);
+Route::prefix('v1')->group(function () {
+    Route::apiResource('students', StudentController::class);
+    Route::apiResource('courses', CourseController::class);
+    Route::apiResource('student-with-course', StudentWithCourseController::class);
+});

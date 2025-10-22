@@ -14,7 +14,8 @@ interface StudentRepositoryInterface
 
     // Relationships
     public function enrollInCourses($studentId, array $courseIds);
-    public function removeFromCourses($studentId, array $courseIds);
+    public function removeFromCourses($studentId, $courseIds);
     public function syncCourses($studentId, array $courseIds);
     public function getCourses($studentId);
+    public function getUnenrolledCourses($studentId);
 }

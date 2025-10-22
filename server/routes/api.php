@@ -25,4 +25,9 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('students', StudentController::class);
     Route::apiResource('courses', CourseController::class);
     Route::apiResource('student-with-course', StudentWithCourseController::class);
+
+    Route::delete(
+        'student-with-course/{studentId}/{courseId}',
+        [StudentWithCourseController::class, 'destroy']
+    );
 });

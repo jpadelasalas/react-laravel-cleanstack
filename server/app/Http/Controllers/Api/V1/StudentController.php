@@ -67,7 +67,8 @@ class StudentController extends Controller
 
             return $this->successResponse(
                 StudentResource::collection($students),
-                'Students fetched successfully!'
+                'Students fetched successfully!',
+                201
             );
         } catch (\Throwable $th) {
             return $this->errorResponse(
@@ -97,7 +98,8 @@ class StudentController extends Controller
 
             return $this->successResponse(
                 new StudentResource($student),
-                'Student added successfully!'
+                'Student added successfully!',
+                201
             );
         } catch (\Throwable $th) {
             return $this->errorResponse(
@@ -128,7 +130,8 @@ class StudentController extends Controller
 
             return $this->successResponse(
                 new StudentResource($student),
-                'Student updated successfully!'
+                'Student updated successfully!',
+                201
             );
         } catch (\Throwable $th) {
             return $this->errorResponse(
@@ -154,13 +157,14 @@ class StudentController extends Controller
     public function destroy(string $id): JsonResponse
     {
         try {
-            // Delete a course through the repository layer with request validation
+            // Delete a course through the repository layer
             $this->repo->delete($id);
 
             // Return a successResponse if deleted successfully
             return $this->successResponse(
                 null,
-                'Student deleted successfully!'
+                'Student deleted successfully!',
+                201
             );
         } catch (\Throwable $th) {
             // Throw an errorResponse if there's an error.

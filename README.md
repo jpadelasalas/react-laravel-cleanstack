@@ -35,12 +35,15 @@ php artisan migrate
 php artisan serve
 ```
 
-note: Before running php artisan migrate, make sure to setup your db
+note: Before running php artisan migrate, make sure to setup your db and your env
 
 ### 3. Client Setup (React)
 
 ```bash
 cd client
 npm install
+cp .env.example .env
 npm run dev
 ```
+
+note: Before running npm run dev, make sure to setup your env

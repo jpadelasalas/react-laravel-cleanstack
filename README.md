@@ -26,6 +26,8 @@ cd react-laravel-cleanstack
 
 ### 2. Server Setup (Laravel)
 
+note: Before running php artisan migrate, make sure to setup your db and your env
+
 ```bash
 cd server
 composer install
@@ -35,9 +37,9 @@ php artisan migrate
 php artisan serve
 ```
 
-note: Before running php artisan migrate, make sure to setup your db and your env
-
 ### 3. Client Setup (React)
+
+note: Before running npm run dev, make sure to setup your env
 
 ```bash
 cd client
@@ -45,5 +47,3 @@ npm install
 cp .env.example .env
 npm run dev
 ```
-
-note: Before running npm run dev, make sure to setup your env

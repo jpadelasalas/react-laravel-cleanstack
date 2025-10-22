@@ -80,7 +80,7 @@ class StudentWithCourseController extends Controller
             $validated = $request->validated();
             $data = $this->studentRepo->enrollInCourses($validated['selectedStudentId'], $validated['course']);
 
-            return $this->successResponse($data, 'Student Enrolled Successfully!');
+            return $this->successResponse(new StudentWithCourseResource($data), 'Student Enrolled Successfully!');
         } catch (\Throwable $th) {
             //throw $th;
             return $this->errorResponse(

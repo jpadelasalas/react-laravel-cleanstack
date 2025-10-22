@@ -13,14 +13,8 @@
  * - Semi hard-coded. CoursesContext is more simplified
  */
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { createContext, useContextSelector } from "use-context-selector";
 import useForm from "../hooks/useForm";
 import { studentValidation } from "../validations/Validations";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -65,7 +59,6 @@ export const StudentsContextProvider = ({ children }) => {
     paginatedData,
     currentPage,
     dataPerPage,
-    totalPages,
     totalData,
     handlePageChange,
     handleRowsPerPageChange,
@@ -273,53 +266,66 @@ export const StudentsContextProvider = ({ children }) => {
   /**
    * Memoized context value for optimization
    */
-  const value = useMemo(
+
+  // Modal
+  const modal = useMemo(
+    () => ({
+      isOpenModal,
+      title,
+      handleOpenModal,
+      handleCloseModal,
+    }),
+    [isOpenModal, title, handleOpenModal, handleCloseModal]
+  );
+
+  // Form
+  const form = useMemo(
     () => ({
       values,
-      formError,
-      isOpenModal,
-      title,
-      paginatedData,
-      search,
-      currentPage,
-      dataPerPage,
-      totalPages,
-      totalData,
-      isFetching,
-      handlePageChange,
-      handleRowsPerPageChange,
-      handleSearch,
-      handleOpenModal,
-      handleCloseModal,
       handleChange,
       handleSubmit,
       handleSubmitForm,
-      onEdit,
+      formError,
       onDelete,
     }),
-    [
-      values,
-      formError,
-      isOpenModal,
-      title,
+    [values, handleChange, handleSubmit, handleSubmitForm, formError, onDelete]
+  );
+
+  // Data
+  const parentData = useMemo(
+    () => ({
       paginatedData,
       search,
       currentPage,
       dataPerPage,
-      totalPages,
       totalData,
-      isFetching,
       handlePageChange,
       handleRowsPerPageChange,
       handleSearch,
-      handleOpenModal,
-      handleCloseModal,
-      handleChange,
-      handleSubmit,
-      handleSubmitForm,
+      isFetching,
       onEdit,
-      onDelete,
+    }),
+    [
+      paginatedData,
+      search,
+      currentPage,
+      dataPerPage,
+      totalData,
+      handlePageChange,
+      handleRowsPerPageChange,
+      handleSearch,
+      isFetching,
+      onEdit,
     ]
+  );
+
+  const value = useMemo(
+    () => ({
+      modal,
+      form,
+      parentData,
+    }),
+    [modal, form, parentData]
   );
 
   return (
@@ -332,4 +338,11 @@ export const StudentsContextProvider = ({ children }) => {
 /**
  * Custom hook to access student context values
  */
-export const useStudents = () => useContext(StudentsContext);
+export const useStudentModal = () =>
+  useContextSelector(StudentsContext, (ctx) => ctx.modal);
+
+export const useStudentForm = () =>
+  useContextSelector(StudentsContext, (ctx) => ctx.form);
+
+export const useStudentParentData = () =>
+  useContextSelector(StudentsContext, (ctx) => ctx.parentData);

@@ -20,7 +20,8 @@
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
-    "sweetalert2": "^11.26.2"
+    "sweetalert2": "^11.26.2",
+    "use-context-selector": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

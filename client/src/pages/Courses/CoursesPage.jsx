@@ -20,8 +20,6 @@ const CoursesPage = () => {
     onEdit,
   } = useCourseData();
   const { modal, handleOpenModal, handleCloseModal } = useCourseModal();
-  console.log("course data:", useCourseData());
-  console.log("modal data:", useCourseModal());
 
   return (
     <>

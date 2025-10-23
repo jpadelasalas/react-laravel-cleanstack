@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\CourseWithStudentController;
 use App\Http\Controllers\Api\V1\StudentWithCourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,9 +26,14 @@ Route::prefix('v1')->group(function () {
     Route::apiResource('students', StudentController::class);
     Route::apiResource('courses', CourseController::class);
     Route::apiResource('student-with-course', StudentWithCourseController::class);
+    Route::apiResource('course-with-student', CourseWithStudentController::class);
 
     Route::delete(
         'student-with-course/{studentId}/{courseId}',
         [StudentWithCourseController::class, 'destroy']
+    );
+    Route::delete(
+        'course-with-student/{courseId}/{studentId}',
+        [CourseWithStudentController::class, 'destroy']
     );
 });

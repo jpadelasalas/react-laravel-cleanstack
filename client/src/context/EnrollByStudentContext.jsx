@@ -1,11 +1,5 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { createContext, useContextSelector } from "use-context-selector";
 import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../utilities/axiosInstance";
@@ -44,6 +38,7 @@ export const EnrollByStudentContextProvider = ({ children }) => {
         text: err?.message || "Something went wrong.",
       });
     },
+    refetchOnMount: false, // prevent fetch if cached
   });
 
   const { data: getCourse } = useQuery({
@@ -129,6 +124,7 @@ export const EnrollByStudentContextProvider = ({ children }) => {
   const onView = useCallback((id) => {
     setSelectedStudentId(id);
     setIsOpenModalData(true);
+    setSelectedCourse([]);
   }, []);
 
   const onDelete = useCallback(
@@ -162,7 +158,7 @@ export const EnrollByStudentContextProvider = ({ children }) => {
     // Get data with course
   }, [students, setPaginatedData]);
 
-  const value = useMemo(
+  const parentData = useMemo(
     () => ({
       search,
       paginatedData,
@@ -173,14 +169,6 @@ export const EnrollByStudentContextProvider = ({ children }) => {
       handleRowsPerPageChange,
       handleSearch,
       studentFetching,
-      isOpenModalData,
-      onView,
-      handleCloseModal,
-      getCourse,
-      onDelete,
-      handleCheckboxChange,
-      selectedCourse,
-      handleEnrollStudent,
     }),
     [
       search,
@@ -192,15 +180,41 @@ export const EnrollByStudentContextProvider = ({ children }) => {
       handleRowsPerPageChange,
       handleSearch,
       studentFetching,
+    ]
+  );
+
+  const modal = useMemo(
+    () => ({
       isOpenModalData,
       onView,
       handleCloseModal,
+    }),
+    [isOpenModalData, onView, handleCloseModal]
+  );
+
+  const form = useMemo(
+    () => ({
+      getCourse,
+      onDelete,
+      handleCheckboxChange,
+      selectedCourse,
+      handleEnrollStudent,
+    }),
+    [
       getCourse,
       onDelete,
       handleCheckboxChange,
       selectedCourse,
       handleEnrollStudent,
     ]
+  );
+  const value = useMemo(
+    () => ({
+      modal,
+      parentData,
+      form,
+    }),
+    [modal, parentData, form]
   );
   return (
     <EnrollByStudentContext.Provider value={value}>
@@ -209,4 +223,9 @@ export const EnrollByStudentContextProvider = ({ children }) => {
   );
 };
 
-export const useEnrollByStudent = () => useContext(EnrollByStudentContext);
+export const useEnrollByStudentModal = () =>
+  useContextSelector(EnrollByStudentContext, (ctx) => ctx.modal);
+export const useEnrollByStudentData = () =>
+  useContextSelector(EnrollByStudentContext, (ctx) => ctx.parentData);
+export const useEnrollByStudentForm = () =>
+  useContextSelector(EnrollByStudentContext, (ctx) => ctx.form);

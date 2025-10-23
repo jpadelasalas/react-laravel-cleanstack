@@ -14,4 +14,7 @@ interface CourseRepositoryInterface
 
     // Relationships
     public function getStudents($courseId);
+    public function getStudentsUnenrolled($courseId);
+    public function dropStudent($courseId, $studentId);
+    public function enrollStudent($courseId, $studentId);
 }

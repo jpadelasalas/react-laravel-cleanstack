@@ -82,6 +82,7 @@ export const StudentsContextProvider = ({ children }) => {
         text: err?.message || "Something went wrong.",
       });
     },
+    refetchOnMount: false, // prevent fetch if cached
   });
 
   /**

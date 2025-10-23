@@ -81,6 +81,7 @@ export const CoursesContextProvider = ({ children }) => {
         text: err?.message || "Something went wrong.",
       });
     },
+    refetchOnMount: false, // prevent fetch if cached
   });
 
   /* ------------------------------- Add Course -------------------------------- */

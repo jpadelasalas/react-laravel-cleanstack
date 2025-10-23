@@ -3,7 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Course;
+use App\Models\Student;
 use App\Repositories\Interfaces\CourseRepositoryInterface;
+use Carbon\Carbon;
 
 class CourseRepository implements CourseRepositoryInterface
 {
@@ -51,5 +53,33 @@ class CourseRepository implements CourseRepositoryInterface
     public function getStudents($courseId)
     {
         return Course::findOrFail($courseId)->students;
+    }
+
+    public function getStudentsUnenrolled($courseId)
+    {
+        $course = Course::findOrFail($courseId);
+
+        return Student::select(['id', 'name', 'email'])->whereNotIn('id', $course->students->pluck('id'))->get();
+    }
+
+    public function dropStudent($courseId, $studentId)
+    {
+        $course = Course::findOrFail($courseId);
+
+        $course->students()->detach($studentId);
+        return $course->load('students');
+    }
+
+    public function enrollStudent($courseId, $studentId)
+    {
+        $course = Course::findOrFail($courseId);
+        $enrollData = [];
+
+        foreach ($studentId as $id) {
+            $enrollData[$id] = ['enrolled_at' => Carbon::now()];
+        }
+
+        $course->students()->attach($enrollData);
+        return $course->load('students');
     }
 }

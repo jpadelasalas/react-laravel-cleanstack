@@ -1,34 +1,33 @@
 /**
  * CoursesContext.jsx
  *
- * Provides a scope context for managing course data (CRUD operations),
- * pagination, search, and form handling across the app.
+ * Context for managing course data — CRUD, pagination, search, and form state.
  *
- * Features:
+ * 🧩 Features:
  * - Fetch courses from API
- * - Add, update, delete courses
- * - Manage form input and validation
- * - Handle pagination with search
- * - Manage modal open/close state
- *  - Simplified version of StudentsContext
+ * - Add / Edit / Delete courses
+ * - Form validation and modal control
+ * - Pagination + search handling
+ *
+ * ⚙️ Uses:
+ * - React Query for server state
+ * - use-context-selector for performance
+ * - Custom hooks: useForm, usePaginationWithSearch
+ * - SweetAlert2 for alerts
+ *
  */
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  useMemo,
-} from "react";
-import useForm from "../hooks/useForm";
-import { courseValidation } from "../validations/Validations";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { createContext, useContextSelector } from "use-context-selector";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
 import Swal from "sweetalert2";
-import { courseService } from "../services/CourseService"; // Compiled all of the axios here
 
-// Create React Context for Courses
+import useForm from "../hooks/useForm";
+import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
+import { courseValidation } from "../validations/Validations";
+import { courseService } from "../services/CourseService";
+
+// Create the context
 const CoursesContext = createContext();
 
 // Default form values
@@ -36,16 +35,16 @@ const initialValues = {
   code: "",
   name: "",
   description: "",
-  units: "",
+  units: "0",
 };
 
 export const CoursesContextProvider = ({ children }) => {
-  const queryClient = useQueryClient(); // React Query cache manager
-  const [modal, setModal] = useState({ open: false, title: "", mode: "" }); // Modal visibility, title, and track edit mode
+  const queryClient = useQueryClient();
 
-  /**
-   * Custom form hook for input management and validation
-   */
+  // Modal state (open, title, and mode = add/edit)
+  const [modal, setModal] = useState({ open: false, title: "", mode: "" });
+
+  // Custom form hook (input + validation)
   const {
     values,
     handleChange,
@@ -55,15 +54,12 @@ export const CoursesContextProvider = ({ children }) => {
     isError: formError,
   } = useForm(initialValues, courseValidation);
 
-  /**
-   * Custom pagination + search hook
-   */
+  // Pagination + search hook
   const {
     search,
     paginatedData,
     currentPage,
     dataPerPage,
-    totalPages,
     totalData,
     handlePageChange,
     handleRowsPerPageChange,
@@ -71,27 +67,23 @@ export const CoursesContextProvider = ({ children }) => {
     setData: setPaginatedData,
   } = usePaginationWithSearch();
 
-  /**
-   * 🟢 Fetch courses (GET /api/v1/courses)
-   */
+  /* -------------------------------- Fetch Data ------------------------------- */
   const { data, isFetching } = useQuery({
     queryKey: ["courses"],
     queryFn: async () => {
       const { data } = await courseService.getAll();
-      return data.data; // backend returns { message, data }
+      return data.data;
     },
     onError: (err) => {
       Swal.fire({
         icon: "error",
-        title: "Error Fetching Courses",
+        title: "Error fetching courses",
         text: err?.message || "Something went wrong.",
       });
     },
   });
 
-  /**
-   * 🟢 Add new course (POST /api/v1/courses)
-   */
+  /* ------------------------------- Add Course -------------------------------- */
   const { mutate: addCourse } = useMutation({
     mutationFn: async (newCourse) => {
       const { data } = await courseService.create(newCourse);
@@ -100,7 +92,7 @@ export const CoursesContextProvider = ({ children }) => {
     onMutate: () => {
       Swal.fire({
         title: "Saving...",
-        text: "Please wait a moment",
+        text: "Please wait",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -112,7 +104,7 @@ export const CoursesContextProvider = ({ children }) => {
       });
       resetForm();
       handleCloseModal();
-      queryClient.invalidateQueries(["courses"]); // refresh list
+      queryClient.invalidateQueries(["courses"]);
     },
     onError: (error) => {
       Swal.fire({
@@ -123,9 +115,7 @@ export const CoursesContextProvider = ({ children }) => {
     },
   });
 
-  /**
-   * 🟡 Update existing course (PUT /api/v1/courses/{id})
-   */
+  /* ------------------------------ Update Course ------------------------------ */
   const { mutate: updateCourse } = useMutation({
     mutationFn: async (course) => {
       const { id, ...payload } = course;
@@ -135,7 +125,7 @@ export const CoursesContextProvider = ({ children }) => {
     onMutate: () => {
       Swal.fire({
         title: "Updating...",
-        text: "Please wait a moment",
+        text: "Please wait",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -160,9 +150,7 @@ export const CoursesContextProvider = ({ children }) => {
     },
   });
 
-  /**
-   * 🔴 Delete course (DELETE /api/v1/courses/{id})
-   */
+  /* ------------------------------ Delete Course ------------------------------ */
   const { mutate: deleteCourse } = useMutation({
     mutationFn: async (id) => {
       const { data } = await courseService.remove(id);
@@ -171,7 +159,7 @@ export const CoursesContextProvider = ({ children }) => {
     onMutate: () => {
       Swal.fire({
         title: "Deleting...",
-        text: "Please wait a moment",
+        text: "Please wait",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading(),
       });
@@ -196,16 +184,12 @@ export const CoursesContextProvider = ({ children }) => {
     },
   });
 
-  /**
-   * ✅ Update the paginated data when courses are fetched
-   */
+  /* --------------------------- Sync fetched data ----------------------------- */
   useEffect(() => {
     if (data) setPaginatedData(data);
   }, [data, setPaginatedData]);
 
-  /**
-   * 🪟 Modal Handlers
-   */
+  /* ------------------------------ Modal Logic -------------------------------- */
   const handleOpenModal = useCallback(() => {
     setModal({
       open: true,
@@ -223,9 +207,6 @@ export const CoursesContextProvider = ({ children }) => {
     resetForm();
   }, [resetForm]);
 
-  /**
-   * ✏️ Edit mode handler
-   */
   const onEdit = useCallback(
     (item) => {
       setModal({
@@ -233,29 +214,17 @@ export const CoursesContextProvider = ({ children }) => {
         title: "Update Course",
         mode: "edit",
       });
-      dispatchForm(item); // populate form with existing data
+      dispatchForm(item);
     },
     [dispatchForm]
   );
 
-  /**
-   * 🗑️ Delete handler
-   */
-  const onDelete = useCallback(
-    (id) => {
-      deleteCourse(id);
-    },
-    [deleteCourse]
-  );
+  const onDelete = useCallback((id) => deleteCourse(id), [deleteCourse]);
 
-  /**
-   * 📤 Add/Update form submission logic
-   */
+  /* ----------------------------- Submit Logic -------------------------------- */
   const handleAddCourse = useCallback((vals) => addCourse(vals), [addCourse]);
   const handleUpdateCourse = useCallback(
-    (vals) => {
-      updateCourse(vals);
-    },
+    (vals) => updateCourse(vals),
     [updateCourse]
   );
 
@@ -268,54 +237,58 @@ export const CoursesContextProvider = ({ children }) => {
     [modal.mode, handleUpdateCourse, handleAddCourse]
   );
 
-  /**
-   * Memoized context value for optimization
-   */
-  const value = useMemo(
+  /* ----------------------------- Memoized Values ----------------------------- */
+  const modalVal = useMemo(
+    () => ({
+      modal,
+      handleOpenModal,
+      handleCloseModal,
+    }),
+    [modal, handleOpenModal, handleCloseModal]
+  );
+
+  const form = useMemo(
     () => ({
       values,
-      formError,
-      modal,
-      paginatedData,
-      search,
-      currentPage,
-      dataPerPage,
-      totalPages,
-      totalData,
-      isFetching,
-      handlePageChange,
-      handleRowsPerPageChange,
-      handleSearch,
-      handleOpenModal,
-      handleCloseModal,
       handleChange,
       handleSubmit,
       handleSubmitForm,
-      onEdit,
+      formError,
       onDelete,
     }),
-    [
-      values,
-      formError,
-      modal,
+    [values, handleChange, handleSubmit, handleSubmitForm, formError, onDelete]
+  );
+
+  const dataState = useMemo(
+    () => ({
       paginatedData,
       search,
       currentPage,
       dataPerPage,
-      totalPages,
       totalData,
-      isFetching,
       handlePageChange,
       handleRowsPerPageChange,
       handleSearch,
-      handleOpenModal,
-      handleCloseModal,
-      handleChange,
-      handleSubmit,
-      handleSubmitForm,
+      isFetching,
       onEdit,
-      onDelete,
+    }),
+    [
+      paginatedData,
+      search,
+      currentPage,
+      dataPerPage,
+      totalData,
+      handlePageChange,
+      handleRowsPerPageChange,
+      handleSearch,
+      isFetching,
+      onEdit,
     ]
+  );
+
+  const value = useMemo(
+    () => ({ modalVal, form, dataState }),
+    [modalVal, form, dataState]
   );
 
   return (
@@ -323,4 +296,14 @@ export const CoursesContextProvider = ({ children }) => {
   );
 };
 
-export const useCourses = () => useContext(CoursesContext);
+/* ----------------------------- Custom Hooks --------------------------------- */
+// keep it short and consistent
+
+export const useCourseModal = () =>
+  useContextSelector(CoursesContext, (ctx) => ctx.modalVal);
+
+export const useCourseForm = () =>
+  useContextSelector(CoursesContext, (ctx) => ctx.form);
+
+export const useCourseData = () =>
+  useContextSelector(CoursesContext, (ctx) => ctx.dataState);

@@ -1,21 +1,13 @@
 import InputField from "../../utilities/InputField";
 import Button from "../../utilities/Button";
 import Table from "../../utilities/Table";
-import ModalComponent from "../../components/ModalComponent";
 import TablePagination from "@mui/material/TablePagination";
 import { LoadingTable } from "../../components/Loading";
-import { useCourses } from "../../context/CoursesContext";
+import { useCourseData, useCourseModal } from "../../context/CoursesContext";
+import CourseFormModal from "../../components/Course/CourseFormModal";
 
 const CoursesPage = () => {
   const {
-    modal,
-    handleOpenModal,
-    handleCloseModal,
-    handleChange,
-    handleSubmit,
-    handleSubmitForm,
-    values,
-    formError,
     paginatedData,
     search,
     currentPage,
@@ -26,91 +18,11 @@ const CoursesPage = () => {
     handleSearch,
     isFetching,
     onEdit,
-    onDelete,
-  } = useCourses();
+  } = useCourseData();
+  const { modal, handleOpenModal, handleCloseModal } = useCourseModal();
+  console.log("course data:", useCourseData());
+  console.log("modal data:", useCourseModal());
 
-  // Content of the modal
-  const children = (
-    <div className="p-4 mb-2 grid grid-cols-1 md:grid-cols-2 md:gap-2 font-mono">
-      <div className="flex flex-col m-1">
-        <label htmlFor="" className="text-lg">
-          {" "}
-          <span className="text-red-500">*</span>Code
-        </label>
-        <InputField
-          type={"text"}
-          name={"code"}
-          placeholder={"Enter Code"}
-          value={values.code}
-          onChange={handleChange}
-          error={formError.code}
-        />
-      </div>
-      <div className="flex flex-col m-1">
-        <label htmlFor="" className="text-lg">
-          {" "}
-          <span className="text-red-500">*</span>Name
-        </label>
-        <InputField
-          type={"text"}
-          name={"name"}
-          placeholder={"Enter Name"}
-          value={values.name}
-          onChange={handleChange}
-          error={formError.name}
-        />
-      </div>
-      <div className="flex flex-col m-1">
-        <label htmlFor="" className="text-lg">
-          {" "}
-          <span className="text-red-500">*</span>Description
-        </label>
-        <InputField
-          type={"text"}
-          name={"description"}
-          placeholder={"Enter Description"}
-          value={values.description}
-          onChange={handleChange}
-          error={formError.description}
-        />
-      </div>
-      <div className="flex flex-col m-1">
-        <label htmlFor="" className="text-lg">
-          {" "}
-          <span className="text-red-500">*</span>Units
-        </label>
-        <InputField
-          type={"number"}
-          name={"units"}
-          value={values.units}
-          onChange={handleChange}
-          error={formError.units}
-        />
-      </div>
-    </div>
-  );
-
-  // Footer of the modal if you have button
-  const footer = (
-    <div className="flex justify-end px-4 pb-2 mb-3 space-x-4">
-      {modal.title !== "Add New Course" && (
-        <Button
-          buttonName={"Delete"}
-          onClick={() => onDelete(values.id)}
-          className={
-            "border py-2 px-1 bg-red-200 w-1/2 md:w-2/5 rounded-sm hover:bg-red-300 active:bg-red-400 cursor-pointer"
-          }
-        />
-      )}
-      <Button
-        buttonName={modal.title === "Add New Course" ? "Add" : "Update"}
-        onClick={handleSubmit(handleSubmitForm)}
-        className={
-          "border py-2 px-1 bg-blue-200 w-1/2 md:w-2/5 rounded-sm hover:bg-blue-300 active:bg-blue-400 cursor-pointer"
-        }
-      />
-    </div>
-  );
   return (
     <>
       <header className="grid grid-cols-1 sm:grid-cols-[8fr_4fr] mt-2 mb-4 max-sm:gap-10">
@@ -136,7 +48,7 @@ const CoursesPage = () => {
         <Table tHead={["ID", "Code", "Name", "Description", "Units"]}>
           {isFetching ? (
             <LoadingTable />
-          ) : paginatedData.length ? (
+          ) : paginatedData?.length ? (
             paginatedData.map((item, index) => (
               <tr
                 key={`${index}-${item.id}`}
@@ -174,15 +86,11 @@ const CoursesPage = () => {
           onRowsPerPageChange={handleRowsPerPageChange}
         />
       </div>
-      {modal.open && (
-        <ModalComponent
-          modalSize={"md"}
-          title={modal.title}
-          children={children}
-          footer={footer}
-          handleCloseModal={handleCloseModal}
-        />
-      )}
+      <CourseFormModal
+        isOpenModal={modal.open}
+        title={modal.title}
+        handleCloseModal={handleCloseModal}
+      />
     </>
   );
 };

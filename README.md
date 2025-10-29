@@ -1,6 +1,6 @@
 # react-laravel-cleanstack
 
-A fullstack **React + Laravel** demo project with clean architecture and dummy data.  
+A fullstack **React + Laravel** demo project with clean architecture.  
 Designed to showcase best practices for scalable code structure and separation of concerns.
 
 ---

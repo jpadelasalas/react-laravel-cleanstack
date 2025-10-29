@@ -19,13 +19,11 @@
 
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { createContext, useContextSelector } from "use-context-selector";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import Swal from "sweetalert2";
 
 import useForm from "../hooks/useForm";
 import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
 import { courseValidation } from "../validations/Validations";
-import { courseService } from "../services/CourseService";
+import useCourse from "../hooks/useCourse";
 
 // Create the context
 const CoursesContext = createContext();
@@ -39,8 +37,6 @@ const initialValues = {
 };
 
 export const CoursesContextProvider = ({ children }) => {
-  const queryClient = useQueryClient();
-
   // Modal state (open, title, and mode = add/edit)
   const [modal, setModal] = useState({ open: false, title: "", mode: "" });
 
@@ -66,129 +62,6 @@ export const CoursesContextProvider = ({ children }) => {
     handleSearch,
     setData: setPaginatedData,
   } = usePaginationWithSearch();
-
-  /* -------------------------------- Fetch Data ------------------------------- */
-  const { data, isFetching } = useQuery({
-    queryKey: ["courses"],
-    queryFn: async () => {
-      const { data } = await courseService.getAll();
-      return data.data;
-    },
-    onError: (err) => {
-      Swal.fire({
-        icon: "error",
-        title: "Error fetching courses",
-        text: err?.message || "Something went wrong.",
-      });
-    },
-    refetchOnMount: false, // prevent fetch if cached
-  });
-
-  /* ------------------------------- Add Course -------------------------------- */
-  const { mutate: addCourse } = useMutation({
-    mutationFn: async (newCourse) => {
-      const { data } = await courseService.create(newCourse);
-      return data;
-    },
-    onMutate: () => {
-      Swal.fire({
-        title: "Saving...",
-        text: "Please wait",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-    },
-    onSuccess: (res) => {
-      Swal.fire({
-        icon: "success",
-        title: res.message || "Course added successfully",
-      });
-      resetForm();
-      handleCloseModal();
-      queryClient.invalidateQueries(["courses"]);
-    },
-    onError: (error) => {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to add course",
-        text: error.response?.data?.message || error.message,
-      });
-    },
-  });
-
-  /* ------------------------------ Update Course ------------------------------ */
-  const { mutate: updateCourse } = useMutation({
-    mutationFn: async (course) => {
-      const { id, ...payload } = course;
-      const { data } = await courseService.update(id, payload);
-      return data;
-    },
-    onMutate: () => {
-      Swal.fire({
-        title: "Updating...",
-        text: "Please wait",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-    },
-    onSuccess: (res) => {
-      Swal.fire({
-        icon: "success",
-        title: res.message || "Course updated successfully",
-        timer: 1500,
-        showConfirmButton: true,
-      });
-      resetForm();
-      handleCloseModal();
-      queryClient.invalidateQueries(["courses"]);
-    },
-    onError: (error) => {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to update course",
-        text: error.response?.data?.message || error.message,
-      });
-    },
-  });
-
-  /* ------------------------------ Delete Course ------------------------------ */
-  const { mutate: deleteCourse } = useMutation({
-    mutationFn: async (id) => {
-      const { data } = await courseService.remove(id);
-      return data;
-    },
-    onMutate: () => {
-      Swal.fire({
-        title: "Deleting...",
-        text: "Please wait",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-    },
-    onSuccess: (res) => {
-      Swal.fire({
-        icon: "success",
-        title: res.message || "Course deleted successfully",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-      resetForm();
-      handleCloseModal();
-      queryClient.invalidateQueries(["courses"]);
-    },
-    onError: (error) => {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to delete course",
-        text: error.response?.data?.message || error.message,
-      });
-    },
-  });
-
-  /* --------------------------- Sync fetched data ----------------------------- */
-  useEffect(() => {
-    if (data) setPaginatedData(data);
-  }, [data, setPaginatedData]);
 
   /* ------------------------------ Modal Logic -------------------------------- */
   const handleOpenModal = useCallback(() => {
@@ -220,7 +93,14 @@ export const CoursesContextProvider = ({ children }) => {
     [dispatchForm]
   );
 
-  const onDelete = useCallback((id) => deleteCourse(id), [deleteCourse]);
+  /* --------------------------- Custom query hook ----------------------------- */
+  const { courseData, isFetching, addCourse, updateCourse, deleteCourse } =
+    useCourse(resetForm, handleCloseModal, search, currentPage);
+
+  /* --------------------------- Sync fetched data ----------------------------- */
+  useEffect(() => {
+    if (courseData) setPaginatedData(courseData);
+  }, [courseData, setPaginatedData]);
 
   /* ----------------------------- Submit Logic -------------------------------- */
   const handleAddCourse = useCallback((vals) => addCourse(vals), [addCourse]);
@@ -237,6 +117,8 @@ export const CoursesContextProvider = ({ children }) => {
     },
     [modal.mode, handleUpdateCourse, handleAddCourse]
   );
+
+  const onDelete = useCallback((id) => deleteCourse(id), [deleteCourse]);
 
   /* ----------------------------- Memoized Values ----------------------------- */
   const modalVal = useMemo(

@@ -140,7 +140,7 @@ class CourseController extends Controller
 
             // Return a successResponse if deleted successfully
             return $this->successResponse(
-                null,
+                $id,
                 'Course deleted successfully!'
             );
         } catch (\Throwable $th) {

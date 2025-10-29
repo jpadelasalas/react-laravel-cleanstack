@@ -119,9 +119,14 @@ const useCourse = (resetForm, handleCloseModal, search, currentPage) => {
       alert.loading("Deleting...");
       await queryClient.cancelQueries(["courses", search, currentPage]);
 
-      const previousData = queryClient.getQueryData(
-        ["courses", search, currentPage],
-        (old) => old.filter((item) => item.id !== deleteCourse.id)
+      const previousData = queryClient.getQueryData([
+        "courses",
+        search,
+        currentPage,
+      ]);
+
+      queryClient.setQueryData(["courses", search, currentPage], (old) =>
+        old.filter((item) => item.id !== deleteCourse.id)
       );
 
       return { previousData };

@@ -1,6 +1,6 @@
-import { courseService } from "../services/CourseService";
+import { courseService } from "../../services/CourseService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { alert } from "../utilities/alert";
+import { alert } from "../../utilities/alert";
 
 const useCourse = (resetForm, handleCloseModal, search, currentPage) => {
   const queryClient = useQueryClient();

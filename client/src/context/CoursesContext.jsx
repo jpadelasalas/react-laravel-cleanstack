@@ -12,7 +12,7 @@
  * ⚙️ Uses:
  * - React Query for server state
  * - use-context-selector for performance
- * - Custom hooks: useForm, usePaginationWithSearch
+ * - Custom hooks: useForm, usePaginationWithSearch, useCourse
  * - SweetAlert2 for alerts
  *
  */
@@ -23,7 +23,7 @@ import { createContext, useContextSelector } from "use-context-selector";
 import useForm from "../hooks/useForm";
 import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
 import { courseValidation } from "../validations/Validations";
-import useCourse from "../hooks/useCourse";
+import useCourse from "../hooks/Course/useCourse";
 
 // Create the context
 const CoursesContext = createContext();

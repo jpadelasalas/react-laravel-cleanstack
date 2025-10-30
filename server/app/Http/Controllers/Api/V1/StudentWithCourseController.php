@@ -147,7 +147,7 @@ class StudentWithCourseController extends Controller
             //code...
             $this->studentRepo->removeFromCourses($studentId, $courseId);
 
-            return $this->successResponse(null, 'Student Unenrolled Successfully!');
+            return $this->successResponse($courseId, 'Student Unenrolled Successfully!');
         } catch (\Throwable $th) {
             //throw $th;
             return $this->errorResponse(

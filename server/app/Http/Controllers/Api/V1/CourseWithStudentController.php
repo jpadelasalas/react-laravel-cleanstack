@@ -61,9 +61,9 @@ class CourseWithStudentController extends Controller
         try {
             //code...
             $validated = $request->validated();
-            $this->courseRepo->enrollStudent($validated['selectedCourseId'], $validated['student']);
+            $data = $this->courseRepo->enrollStudent($validated['selectedCourseId'], $validated['student']);
 
-            return $this->successResponse(null, 'Students Enrolled Successfully!', 201);
+            return $this->successResponse($data, 'Students Enrolled Successfully!', 201);
         } catch (\Throwable $th) {
             //throw $th;
             return $this->errorResponse('Unable to enroll student.', 402, $th->getMessage());
@@ -80,7 +80,7 @@ class CourseWithStudentController extends Controller
             //code...
             $this->courseRepo->dropStudent($courseId, $studentId);
 
-            return $this->successResponse(null, 'Student Unenrolled Successfully!');
+            return $this->successResponse($studentId, 'Student Unenrolled Successfully!');
         } catch (\Throwable $th) {
             //throw $th;
             return $this->errorResponse(

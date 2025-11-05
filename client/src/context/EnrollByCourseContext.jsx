@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createContext, useContextSelector } from "use-context-selector";
 import usePaginationWithSearch from "../hooks/usePaginationWithSearch";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../utilities/axiosInstance";
-import Swal from "sweetalert2";
+import useEnrollByCourse from "../hooks/Enrollment/useEnrollByCourse";
 
 const EnrollByCourseContext = createContext();
 
@@ -11,7 +9,6 @@ export const EnrollByCourseContextProvider = ({ children }) => {
   const [isOpenModalData, setIsOpenModalData] = useState(false);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState([]);
-  const queryClient = useQueryClient(); // React Query cache manager
   const [courseInfo, setCourseInfo] = useState({ code: "", name: "" });
 
   const {
@@ -26,100 +23,8 @@ export const EnrollByCourseContextProvider = ({ children }) => {
     handleSearch,
   } = usePaginationWithSearch();
 
-  const { data: courses, isFetching: courseFetching } = useQuery({
-    queryKey: ["course-with-student"],
-    queryFn: async () => {
-      const { data } = await axiosInstance.get("/api/v1/course-with-student");
-      return data.data;
-    },
-    onError: (err) => {
-      Swal.fire({
-        icon: "error",
-        title: "Error Fetching Course",
-        text: err?.message || "Something went wrong.",
-      });
-    },
-    refetchOnMount: false, // prevent fetch if cached
-  });
-
-  const { data: getStudents } = useQuery({
-    queryKey: ["course-with-student", selectedCourseId],
-    queryFn: async () => {
-      const { data } = await axiosInstance.get(
-        `/api/v1/course-with-student/${selectedCourseId}`
-      );
-      return data.data;
-    },
-    enabled: !!isOpenModalData && !!selectedCourseId, // Proceed if and only if these conditions are true
-  });
-
-  const { mutate: unenroll } = useMutation({
-    mutationFn: async (studentId) => {
-      const { data } = await axiosInstance.delete(
-        `/api/v1/course-with-student/${selectedCourseId}/${studentId}`
-      );
-      return data;
-    },
-    onMutate: () => {
-      Swal.fire({
-        title: "Unenrolling...",
-        text: "Please wait a moment",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-    },
-    onSuccess: (res) => {
-      Swal.fire({
-        icon: "success",
-        title: res.message || "Student Unenrolled Successfully!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-      queryClient.invalidateQueries(["course-with-student", selectedCourseId]);
-    },
-    onError: (error) => {
-      Swal.fire({
-        icon: "error",
-        title: error.message || "Failed to unenroll the student",
-        text: error.response?.data?.message || error.message,
-      });
-    },
-  });
-
-  const { mutate: enroll } = useMutation({
-    mutationFn: async (student) => {
-      const { data } = await axiosInstance.post(`/api/v1/course-with-student`, {
-        selectedCourseId,
-        student,
-      });
-      return data;
-    },
-    onMutate: () => {
-      Swal.fire({
-        title: "Enrolling...",
-        text: "Please wait a moment",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
-    },
-    onSuccess: (res) => {
-      Swal.fire({
-        icon: "success",
-        title: res.message || "Student Enrolled Successfully!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-      setSelectedStudent([]);
-      queryClient.invalidateQueries(["course-with-student", selectedCourseId]);
-    },
-    onError: (err) => {
-      Swal.fire({
-        icon: "error",
-        title: err.message || "Failed to enroll the student.",
-        text: err.response?.data?.message || err.message,
-      });
-    },
-  });
+  const { courses, courseFetching, getStudents, unenroll, enroll } =
+    useEnrollByCourse(isOpenModalData, selectedCourseId, setSelectedStudent);
 
   const onView = useCallback((course) => {
     setSelectedCourseId(course.id);
